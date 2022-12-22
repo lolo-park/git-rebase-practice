@@ -25,6 +25,31 @@ app.get("/ping", (req, res) => {
   res.json({ messgae: "pong" });
 });
 
+app.post("/users/signin", async (req, res) => {
+  const { email, password } = req.body;
+  const user = await appDataSource.query(
+    `
+        SELECT
+          users.id
+          users.password
+        FROM 
+          users
+        WHERE 
+          users.email = ?
+      `,
+    [email]
+  );
+
+  if (!user) {
+    return res.json({ message: "SIGN_UP_REQUIRED" });
+  }
+
+  if (!(user[0].password === password)) {
+    return res.json({ message: "INVALID_PASSWORD" });
+  }
+  return res.json({ userId: user.id });
+});
+
 /*
 [TEST]
 각 브랜치에 맞는 API를 현재 주석의 밑, 34번 라인부터 작성해주세요.
